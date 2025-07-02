@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aacc536dcb425fda9a85f081adfef780, type: 3}
+  m_Name: GameConfig
+  m_EditorClassIdentifier: 
+  meleePrefab: {fileID: -7299051721934502411, guid: db627ea2efa06239787b832b93bb9b64, type: 3}
+  rangePrefab: {fileID: -4188247624273918247, guid: 67bb3cc32bc959e34aaf5a07f122252e, type: 3}
+  exploderPrefab: {fileID: -5486586770240176848, guid: 648742a9aae285d3b8ed69569dedb7ee, type: 3}
