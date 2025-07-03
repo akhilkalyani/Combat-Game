@@ -1,10 +1,11 @@
+using System;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
     public float moveSpeed = 2;
-    public float damage = 25f;
-    public float range = 100f;
+    public float range = 20f;
+    private float health = 60;
     public Camera cam;
     void OnEnable()
     {
@@ -53,5 +54,27 @@ public class PlayerController : MonoBehaviour
     {
         InputManager.onMove -= Move;
         InputManager.onShoot -= Shoot;
+    }
+
+    internal bool TakeDamge(float hit)
+    {
+        if (health > 0)
+        {
+            health -= hit;
+        }
+
+        if (health <= 0)
+        {
+            Die();
+            return false;
+        }
+
+        return true;
+    }
+
+    private void Die()
+    {
+        var mesh = GetComponent<MeshRenderer>();
+        mesh.enabled = false;
     }
 }

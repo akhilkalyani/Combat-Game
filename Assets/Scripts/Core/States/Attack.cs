@@ -6,12 +6,15 @@ using UnityEngine.AI;
 public class Attack : State
 {
     private State nextState;
+    private float hitPoint = 10;
     private float stopDistance = 10f;
-    private float attackCooldown = 1f;  // seconds between attacks
+    private float attackCooldown = 1.5f;  // seconds between attacks
     private float lastAttackTime = 0f;
     private float raycastRange = 20f;
+    private PlayerController playerController;
     public Attack(NavMeshAgent navMeshAgent, Transform player) : base(navMeshAgent, player)
     {
+        playerController = player.GetComponent<PlayerController>();
         type = StateType.Attack;
     }
     public void SetNextState(State state)
@@ -62,7 +65,10 @@ public class Attack : State
 
             if (hit.collider.tag=="Player")
             {
-                Debug.Log("Enemy hit the player!");
+                if (!playerController.TakeDamge(hitPoint))
+                {
+                    instance.ChangeState(nextState);
+                }
             }
         }
     }
