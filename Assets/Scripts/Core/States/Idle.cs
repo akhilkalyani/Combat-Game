@@ -6,26 +6,33 @@ using UnityEngine.AI;
 public class Idle : State
 {
     public Transform[] points;         // Assign 4 (or more) patrol point transforms
-    private int destPoint = 0;
+    public int destPoint = 0;
+    private float thresholdDistance = 40f;
     private bool circular = true;    // true = loop; false = back-and-forth
     private bool goingForward = true;
-    public Idle(NavMeshAgent entity, Transform[] points) : base(entity)
+    private State nextState;
+    private bool isHome = true;
+    public Idle(NavMeshAgent entity, Transform player, Transform[] points) : base(entity, player)
     {
+        type = StateType.Idle;
         this.points = points;
         agent.autoBraking = false;
+    }
+    public void SetNextState(State state) {
+        nextState = state;
     }
     public override void Enter()
     {
         Debug.Log("Idle state enter");
-        destPoint = 0;
-        GotoNextPoint();
+        agent.ResetPath();
+        agent.SetDestination(points[0].position);
         isExit = false;
     }
     void GotoNextPoint()
     {
         if (points.Length == 0) return;
 
-        agent.destination = points[destPoint].position;
+        agent.SetDestination(points[destPoint].position);
 
         if (circular)
             destPoint = (destPoint + 1) % points.Length;
@@ -54,10 +61,22 @@ public class Idle : State
     public override void Update()
     {
         // Once close enough, head to the next waypoint
-        if (!isExit && !agent.pathPending && agent.remainingDistance < 0.5f)
-            GotoNextPoint();
-    }
+        if (!isExit)
+        {
+            if (!agent.pathPending && agent.remainingDistance < 0.5f)
+            {
+                GotoNextPoint();
+                isHome = true;
+            }
 
+            if (isHome && Vector3.Distance(instance.transform.position, player.position) <= thresholdDistance)
+            {
+                isHome = false;
+                //chnage state to chase
+                instance.ChangeState(nextState);
+            }
+        }
+    }
     public override void Exit()
     {
         Debug.Log("Idle state exit");

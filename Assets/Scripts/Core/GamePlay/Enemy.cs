@@ -6,50 +6,28 @@ using UnityEngine.AI;
 
 public class Enemy : MonoBehaviour
 {
-    public GameObject sensor;
+    public Transform player;
     public Transform[] points;
     private NavMeshAgent agent;
     private float health = 50;
     private Idle idleState;
-    private Attack attackState;
     private Chase chaseState;
+    private Attack attackState;
     private State currentState;
     private bool isStateChanging = false;
-    internal Vector3 shootPoint;
-
+    public StateType stateType;
     void Awake()
     {
-        shootPoint = transform.forward;
         agent = GetComponent<NavMeshAgent>();
-        idleState = new Idle(agent, points);
-        attackState=new Attack(agent);
-        chaseState =new Chase(agent,attackState);
+        idleState = new Idle(agent, player, points);
+        attackState = new Attack(agent, player);
+        chaseState = new Chase(agent, player, attackState);
+        attackState.SetNextState(idleState);
+        idleState.SetNextState(chaseState);
     }
     void Start()
     {
         ChangeState(idleState);
-    }
-    void OnEnable()
-    {
-        SensorEvents.OnPlayerEnteredArena += ChasePlayer;
-        SensorEvents.OnPlayerExitedArena += StopPlayer;
-    }
-
-    private void StopPlayer(string sensorName)
-    {
-        if (sensor.name == sensorName)
-        {
-            ChangeState(idleState);
-        }
-    }
-
-    private void ChasePlayer(string sensorName, Transform player)
-    {
-        if (sensorName == sensor.name)
-        {
-            chaseState.target = player;
-            ChangeState(chaseState);
-        }
     }
     public void ChangeState(State state)
     {
@@ -59,15 +37,12 @@ public class Enemy : MonoBehaviour
         currentState = state;
         currentState.Enter();
         isStateChanging = false;
+        stateType = currentState.type;
     }
     // Update is called once per frame
     void Update()
     {
         if (!isStateChanging && currentState != null)
             currentState.Update();
-    }
-    void OnDisable()
-    {
-        SensorEvents.OnPlayerEnteredArena -= ChasePlayer;
     }
 }

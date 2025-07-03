@@ -5,19 +5,19 @@ using UnityEngine.AI;
 
 public class Chase : State
 {
-    public Transform target;
-    private float stopDistance = 2f;
+    private float stopDistance = 10f;
     private float arrivalThreshold = 0.3f;
     private State nextState=null;
-    public Chase(NavMeshAgent navMeshAgent, State nextState) : base(navMeshAgent)
+    public Chase(NavMeshAgent navMeshAgent,Transform player,State nextState) : base(navMeshAgent,player)
     {
+        type = StateType.Chase;
         this.nextState = nextState;
     }
 
     public override void Enter()
     {
         Debug.Log("chase state enter");
-        if(target==null){
+        if(player==null){
         Debug.Log("target is null");
 
         }
@@ -33,26 +33,22 @@ public class Chase : State
 
     public override void Update()
     {
-        if (isExit || target == null)
+        if (isExit || player == null)
             return;
 
-        Vector3 toTarget = target.position - agent.transform.position;
+        Vector3 toTarget = player.position - agent.transform.position;
         Vector3 direction = toTarget.normalized;
-        Vector3 chasePosition = target.position - direction * stopDistance;
+        Vector3 chasePosition = player.position - direction * stopDistance;
 
         // Set destination only if different
         if (Vector3.Distance(agent.destination, chasePosition) > 0.5f)
         {
             agent.SetDestination(chasePosition);
         }
-
-        // Check if reached the offset position
         if (!agent.pathPending && agent.remainingDistance <= stopDistance + arrivalThreshold)
         {
             Debug.Log("Reached chase target with offset. Exiting chase state.");
-            var st = (Attack)nextState;
-            st.target = target;
-            instance.ChangeState(st);
+            instance.ChangeState(nextState);
         }
     }
 }

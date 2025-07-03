@@ -13,6 +13,7 @@ public class InputManager : MonoBehaviour
     public float shootCooldown = 1f; // Cooldown in seconds
     private float shootTimer = 0f;   // Time since last shot
     private bool isCooldown = false;
+    private Vector2 moveVector;
     void Awake()
     {
         shootBtn.onClick.AddListener(OnShoot);
@@ -32,7 +33,11 @@ public class InputManager : MonoBehaviour
     void Update()
     {
         //Movement
-        onMove?.Invoke(playerTag, new Vector2(joystick.Horizontal, joystick.Vertical));
+        moveVector = new Vector2(joystick.Horizontal, joystick.Vertical);
+        if (moveVector != Vector2.zero)
+        {
+            onMove?.Invoke(playerTag, moveVector);
+        }
         // Cooldown Timer Logic
         if (isCooldown)
         {
