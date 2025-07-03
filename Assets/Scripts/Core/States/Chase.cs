@@ -45,7 +45,7 @@ public class Chase : State
         {
             agent.SetDestination(chasePosition);
         }
-        if (!agent.pathPending && agent.remainingDistance <= stopDistance + arrivalThreshold)
+        if (!agent.pathPending && agent.remainingDistance <= stopDistance)
         {
             Debug.Log("Reached chase target with offset. Exiting chase state.");
             instance.ChangeState(nextState);
