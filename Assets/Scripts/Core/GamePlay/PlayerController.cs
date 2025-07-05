@@ -3,9 +3,12 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    private float hitPoint = 60;
     public float moveSpeed = 2;
     public float range = 20f;
     private float health = 60;
+    private bool isEnemeyInRange = false;
+    private Enemy detectedEnemy;
     public Camera cam;
     void OnEnable()
     {
@@ -13,26 +16,50 @@ public class PlayerController : MonoBehaviour
         InputManager.onShoot += Shoot;
     }
 
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.CompareTag("Enemy"))
+        {
+            isEnemeyInRange = true;
+            detectedEnemy = other.gameObject.GetComponent<Enemy>();
+        }
+    }
+
+    void OnTriggerExit(Collider other)
+    {
+        if (other.gameObject.CompareTag("Enemy"))
+        {
+            isEnemeyInRange = false;
+            detectedEnemy = null;
+        }
+    }
+
     private void Shoot(string tag)
     {
         if (tag == "Player")
         {
             //shoot logic
-            Debug.Log("Shooting.");
-            Ray ray = cam.ScreenPointToRay(Input.mousePosition);
-
-            if (Physics.Raycast(ray, out RaycastHit hit, range))
+            Vector3 shootOrigin = transform.position + Vector3.up;
+            Vector3 direction=transform.forward;
+            if (!detectedEnemy) return;
+            if (Physics.Raycast(shootOrigin, detectedEnemy.transform.position-transform.position, out RaycastHit hit,Mathf.Infinity))
             {
-                // Enemy enemy = hit.collider.GetComponent<Enemy>();
-                // if (enemy != null)
-                // {
-                //     enemy.TakeDamage(damage);
-                // }
-
-                Debug.DrawLine(ray.origin, hit.point, Color.red, 1f); // Visual debug
+                Debug.DrawRay(shootOrigin, direction * range, Color.red, 0.5f);
+                Debug.Log("Shooting.");
+                if (hit.collider.CompareTag("Enemy"))
+                {
+                    detectedEnemy.TakeDamage(hitPoint);
+                }
             }
         }
+
     }
+
+    private void ShootEnemy(Transform enemyPoint)
+    {
+
+    }
+
     private void Move(string tag, Vector2 moveVector)
     {
         if (tag == "Player" && moveVector != Vector2.zero)

@@ -9,7 +9,7 @@ public class Enemy : MonoBehaviour
     public Transform player;
     public Transform[] points;
     private NavMeshAgent agent;
-    private float health = 50;
+    private float health = 60;
     private Idle idleState;
     private Chase chaseState;
     private Attack attackState;
@@ -44,5 +44,25 @@ public class Enemy : MonoBehaviour
     {
         if (!isStateChanging && currentState != null)
             currentState.Update();
+    }
+
+    internal void TakeDamage(float hitPoint)
+    {
+        if (health > 0)
+        {
+            health -= hitPoint;
+        }
+        
+        if (health <= 0)
+        {
+            Die();
+        }
+    }
+
+    private void Die()
+    {
+        currentState.Exit();
+        var mesh = GetComponent<MeshRenderer>();
+        mesh.enabled = false;
     }
 }
