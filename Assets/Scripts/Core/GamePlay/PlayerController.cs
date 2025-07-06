@@ -1,4 +1,5 @@
 using System;
+using Unity.Mathematics;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -11,6 +12,7 @@ public class PlayerController : MonoBehaviour
     private Enemy detectedEnemy;
     public Camera cam;
     private MeshRenderer mesh;
+    private int killCount = 0;
     private Vector3 initialPosition;
 
     void Awake()
@@ -49,11 +51,11 @@ public class PlayerController : MonoBehaviour
             //shoot logic
             Vector3 shootOrigin = transform.position + Vector3.up;
             if (!detectedEnemy) return;
-            Vector3 direction = detectedEnemy.transform.position - transform.position;
+            Vector3 direction = (detectedEnemy.transform.position - transform.position).normalized;
 
-            if (Physics.Raycast(shootOrigin, direction, out RaycastHit hit, Mathf.Infinity))
+            if (Physics.Raycast(shootOrigin, direction, out RaycastHit hit,Mathf.Infinity))
             {
-                Debug.DrawRay(shootOrigin, direction * range, Color.red, 0.5f);
+                Debug.DrawRay(shootOrigin, direction * range, Color.green, 0.5f);
                 Debug.Log("Shooting.");
                 if (hit.collider.CompareTag("Enemy"))
                 {
@@ -61,6 +63,9 @@ public class PlayerController : MonoBehaviour
                     {
                         health += 60;
                         health = health > 100 ? 100 : health;
+                        killCount++;
+                        UIController.Instance.UpdateKillInfo(killCount);
+                        UIController.Instance.UpdatePlayerHealth(health, 100);
                     }
                 }
             }

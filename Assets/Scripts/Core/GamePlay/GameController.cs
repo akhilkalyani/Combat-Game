@@ -41,7 +41,6 @@ public class GameController : SingleTon<GameController>
                 //game over
                 return;
             }
-            UIController.Instance.UpdateKillInfo(killCount++);
             InputManager.Instance.lockInputControll = true;
             CameraFollow.Instance.ResetCamera();
             player.RestPosition();
@@ -59,6 +58,7 @@ public class GameController : SingleTon<GameController>
     private IEnumerator SpawnPlayer()
     {
         playerSpawnCount--;
+        UIController.Instance.ResetPlayer();
         yield return new WaitForSeconds(1);
         if (playerSpawnCount > 0)
         {

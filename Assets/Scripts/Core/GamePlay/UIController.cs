@@ -30,20 +30,25 @@ public class UIController : SingleTon<UIController>
     {
         killtxt.text = "kill->" + kill;
     }
+    public void ResetPlayer()
+    {
+        infortxt.text = "ReSpawn player";
+        coroutine=StartCoroutine(FadeWaveInfo());
+    }
     private IEnumerator FadeWaveInfo()
     {
         float t = 0;
-        while (t <=1)
+        while (t <= 1)
         {
-            t += Time.deltaTime * (1/0.5f);
+            t += Time.deltaTime * (1 / 0.5f);
             infoCanGrp.alpha = t;
             yield return null;
         }
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(1f);
         t = 1;
-        while (t >=0)
+        while (t >= 0)
         {
-            t -= Time.deltaTime*(1/0.5f);
+            t -= Time.deltaTime * (1 / 0.5f);
             infoCanGrp.alpha = t;
         }
         StopCoroutine(coroutine);
