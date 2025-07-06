@@ -8,7 +8,7 @@ public class Attack : State
     private State nextState;
     private float hitPoint = 10;
     private float stopDistance = 10f;
-    private float attackCooldown = 1.5f;  // seconds between attacks
+    private float attackCooldown = 2f;  // seconds between attacks
     private float lastAttackTime = 0f;
     private float raycastRange = 20f;
     private PlayerController playerController;
@@ -68,6 +68,7 @@ public class Attack : State
                 if (!playerController.TakeDamge(hitPoint))
                 {
                     instance.ChangeState(nextState);
+                    GameController.Instance.RespawnPlayer();
                 }
             }
         }

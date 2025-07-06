@@ -16,8 +16,11 @@ public class Enemy : MonoBehaviour
     private State currentState;
     private bool isStateChanging = false;
     public StateType stateType;
+    private MeshRenderer mesh;
+    public bool isAlive = false;
     void Awake()
     {
+        mesh=GetComponent<MeshRenderer>();
         agent = GetComponent<NavMeshAgent>();
         idleState = new Idle(agent, player, points);
         attackState = new Attack(agent, player);
@@ -42,27 +45,40 @@ public class Enemy : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (!isAlive) return;
         if (!isStateChanging && currentState != null)
             currentState.Update();
     }
 
-    internal void TakeDamage(float hitPoint)
+    internal bool TakeDamage(float hitPoint)
     {
         if (health > 0)
         {
             health -= hitPoint;
         }
-        
+
         if (health <= 0)
         {
             Die();
+            return true;
         }
+        return false;
     }
 
     private void Die()
     {
+        isAlive = false;
         currentState.Exit();
-        var mesh = GetComponent<MeshRenderer>();
         mesh.enabled = false;
+        GameController.Instance.UpdateEnemyCount();
+    }
+
+    internal void Spawn()
+    {
+        health = 100;
+        mesh.enabled = true;
+        isAlive = true;
+        isStateChanging = false;
+        ChangeState(idleState);
     }
 }

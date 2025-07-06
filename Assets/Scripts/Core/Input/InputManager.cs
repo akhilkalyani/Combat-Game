@@ -3,7 +3,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class InputManager : MonoBehaviour
+public class InputManager : SingleTon<InputManager>
 {
     public FixedJoystick joystick;
     public Button shootBtn;
@@ -14,6 +14,7 @@ public class InputManager : MonoBehaviour
     private float shootTimer = 0f;   // Time since last shot
     private bool isCooldown = false;
     private Vector2 moveVector;
+    public bool lockInputControll=false;
     void Awake()
     {
         shootBtn.onClick.AddListener(OnShoot);
@@ -21,6 +22,7 @@ public class InputManager : MonoBehaviour
 
     private void OnShoot()
     {
+        if (lockInputControll) return;
         if (!isCooldown)
         {
             // Shoot!
@@ -32,6 +34,7 @@ public class InputManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (lockInputControll) return;
         //Movement
         moveVector = new Vector2(joystick.Horizontal, joystick.Vertical);
         if (moveVector != Vector2.zero)
@@ -48,8 +51,9 @@ public class InputManager : MonoBehaviour
             }
         }
     }
-    void OnDestroy()
+    protected override void OnDestroy()
     {
         shootBtn.onClick.RemoveListener(OnShoot);
+        base.OnDestroy();
     }
 }

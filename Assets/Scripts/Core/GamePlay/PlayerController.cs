@@ -3,13 +3,21 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    private float hitPoint = 60;
+    private float hitPoint = 10;
     public float moveSpeed = 2;
     public float range = 20f;
-    private float health = 60;
+    private float health = 100;
     private bool isEnemeyInRange = false;
     private Enemy detectedEnemy;
     public Camera cam;
+    private MeshRenderer mesh;
+    private Vector3 initialPosition;
+
+    void Awake()
+    {
+        initialPosition = transform.position;
+        mesh = GetComponent<MeshRenderer>();
+    }
     void OnEnable()
     {
         InputManager.onMove += Move;
@@ -40,24 +48,23 @@ public class PlayerController : MonoBehaviour
         {
             //shoot logic
             Vector3 shootOrigin = transform.position + Vector3.up;
-            Vector3 direction=transform.forward;
             if (!detectedEnemy) return;
-            if (Physics.Raycast(shootOrigin, detectedEnemy.transform.position-transform.position, out RaycastHit hit,Mathf.Infinity))
+            Vector3 direction = detectedEnemy.transform.position - transform.position;
+
+            if (Physics.Raycast(shootOrigin, direction, out RaycastHit hit, Mathf.Infinity))
             {
                 Debug.DrawRay(shootOrigin, direction * range, Color.red, 0.5f);
                 Debug.Log("Shooting.");
                 if (hit.collider.CompareTag("Enemy"))
                 {
-                    detectedEnemy.TakeDamage(hitPoint);
+                    if (detectedEnemy.TakeDamage(hitPoint))
+                    {
+                        health += 60;
+                        health = health > 100 ? 100 : health;
+                    }
                 }
             }
         }
-
-    }
-
-    private void ShootEnemy(Transform enemyPoint)
-    {
-
     }
 
     private void Move(string tag, Vector2 moveVector)
@@ -88,6 +95,7 @@ public class PlayerController : MonoBehaviour
         if (health > 0)
         {
             health -= hit;
+            UIController.Instance.UpdatePlayerHealth(health, 100);
         }
 
         if (health <= 0)
@@ -101,7 +109,17 @@ public class PlayerController : MonoBehaviour
 
     private void Die()
     {
-        var mesh = GetComponent<MeshRenderer>();
         mesh.enabled = false;
+        InputManager.Instance.lockInputControll = true;
+    }
+    public void Spawn()
+    {
+        mesh.enabled = true;
+        transform.position = initialPosition;
+        health = 100;
+    }
+    public void RestPosition()
+    {
+        transform.position = initialPosition;
     }
 }
